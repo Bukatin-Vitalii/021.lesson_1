@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>My Strange Shop</title>
+	<link rel="stylesheet" href="./styles/null.css">
+	<link rel="stylesheet" href="./styles/index.css">
+</head>
+<body>
+	<div class="container">
+		<h1 class="title">
+			My Strange Shop
+		</h1>
+		<div class="shop">
+			<div class="shop__side categories">
+				<ul class="shop__list categories__list"></ul>
+			</div>
+			<div class="shop__side products">
+				<ul class="shop__list products__list"></ul>
+			</div>
+			<div class="shop__side product">
+				<div class="shop__list product__info"></div>
+			</div>
+		</div>
+		<form class="form">
+			<div class="form__input-wrapper">
+				<label for="fullName">Enter your full name:</label>
+				<input class="form__input form__input_required" type="text" id="fullName" name="fullName">
+			</div>
+			<div class="form__input-wrapper">
+				<label for="city">Choose your city:</label>
+				<select class="form__input" name="city" id="city"></select>
+			</div>
+			<div class="form__input-wrapper">
+				<label for="novaPoshta">Enter the post office number:</label>
+				<input class="form__input form__input_required" type="number" id="novaPoshta" name="novaPoshta">
+			</div>
+			<div class="form__input-wrapper">
+				<label for="payMethod">Select your pay method:</label>
+				<select class="form__input" name="payMethod" id="payMethod"></select>
+			</div>
+			<div class="form__input-wrapper">
+				<label for="quantity">Enter quantity you want to buy:</label>
+				<input class="form__input form__input_required" type="number" id="quantity" name="quantity">
+			</div>
+			<div class="form__input-wrapper">
+				<label for="comment">Enter your comment:</label>
+				<textarea class="form__input" name="comment" id="comment" cols="30" rows="3"></textarea>
+			</div>
+			<button type="submit" class="form__submit">Buy</button>
+		</form>
+	</div>
+	<div class="lds-spinner loader"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+	<script src="index.js" type="module"></script>
+</body>
+</html>
