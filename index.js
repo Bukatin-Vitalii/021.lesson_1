@@ -192,7 +192,6 @@ function showOrderReceipt(data) {
 		const li = document.createElement('li');
 		li.classList.add('receipt__item');
 		if (key === 'imageLink') {
-			console.log('pidar')
 			const image = document.createElement('img')
 			image.classList.add('receipt__item--image')
 			image.src = data.productData[key]
