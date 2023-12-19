@@ -7,39 +7,56 @@ const productInfo = document.querySelector('.product__info');
 let currentCategory;
 let itemToOrder;
 
-const renderList = (list, domEl) => {
+const form = document.querySelector('.form');
+const cityList = ['Odessa', 'Kiev', 'Lviv', 'Kharkiv', 'Dnipro', 'Zaporizhzhia'];
+const paymentList = ['Cash', 'Card', 'PayPal'];
+const formBtn = document.querySelector('.form__submit');
+
+const loader = document.querySelector('.loader');
+
+function renderList(list, domEl) {
 	if (domEl.children.length > 0) {
-		domEl.innerHTML = '';
+		domEl.textContent = '';
 	}
 
 	list.forEach((item) => {
-		const li = document.createElement('li');
-		li.classList.add('shop__item');
-		li.dataset.id = item.id;
-		li.textContent = item.name;
-		li.addEventListener('click', () => {
-			if (item.categoriesId) {
-				renderItem(item);
-				hideBuyForm();
-			} else {
-				if (currentCategory !== item.id) {
-					productInfo.innerHTML = '';
-				}
-				hideBuyForm();
-				currentCategory = item.id;
-				renderList(products.filter((product) => product.categoriesId === item.id), productsList);
-			}
-		});
-
+		const li = createListItem(item);
 		domEl.append(li);
 	});
+}
+
+function createListItem(item) {
+	const li = document.createElement('li');
+	li.classList.add('shop__item');
+	li.dataset.id = item.id;
+	li.textContent = item.name;
+	li.addEventListener('click', () => handleListItemClick(item));
+	return li;
+}
+
+function handleListItemClick(item) {
+	if (item.categoriesId) {
+		renderItem(item);
+		hideBuyForm();
+	} else {
+		handleCategoryClick(item);
+	}
+}
+
+function handleCategoryClick(category) {
+	if (currentCategory !== category.id) {
+		productInfo.textContent = '';
+	}
+	hideBuyForm();
+	currentCategory = category.id;
+	renderList(products.filter((product) => product.categoriesId === category.id), productsList);
 }
 
 renderList(categories, categoriesList);
 
 const renderItem = (item) => {
 	if (productInfo.children.length > 0) {
-		productInfo.innerHTML = '';
+		productInfo.textContent = '';
 	}
 	const title = document.createElement('h2');
 	title.classList.add('product__title');
@@ -73,8 +90,6 @@ const hideBuyForm = () => {
 	itemToOrder = null;
 };
 
-const form = document.querySelector('.form');
-
 function fillSelectInput(select, list) {
 	list.forEach((item) => {
 		const option = document.createElement('option');
@@ -84,15 +99,9 @@ function fillSelectInput(select, list) {
 	});
 }
 
-const cityList = ['Odessa', 'Kiev', 'Lviv', 'Kharkiv', 'Dnipro', 'Zaporizhzhia'];
-const citySelect = document.querySelector('#city');
-fillSelectInput(citySelect, cityList);
+fillSelectInput(document.querySelector('#city'), cityList);
+fillSelectInput(document.querySelector('#payMethod'), paymentList);
 
-const paymentList = ['Cash', 'Card', 'PayPal'];
-const paymentSelect = document.querySelector('#payMethod');
-fillSelectInput(paymentSelect, paymentList);
-
-const formBtn = document.querySelector('.form__submit');
 formBtn.addEventListener('click', async (event) => {
 	event.preventDefault();
 
@@ -154,8 +163,7 @@ function validateForm() {
 	return isValid;
 }
 
-const loader = document.querySelector('.loader');
-function showLoader() {
+const showLoader = () => {
 	return new Promise((resolve) => {
 		loader.classList.add('loader_active');
 		setTimeout(() => {
@@ -163,11 +171,11 @@ function showLoader() {
 			loader.classList.remove('loader_active');
 		}, 1500);
 	});
-}
-
-
+};
 
 function showOrderReceipt(data) {
+	const { userData, productData } = data;
+
 	const blur = document.createElement('div');
 	blur.classList.add('blur');
 	document.body.append(blur);
@@ -177,39 +185,16 @@ function showOrderReceipt(data) {
 
 	const receiptTitle = document.createElement('h2');
 	receiptTitle.classList.add('receipt__title');
-	receiptTitle.textContent = 'Your order successfully created!';
+	receiptTitle.textContent = 'Your order successfully created! :))';
 
 	const receipt = document.createElement('div');
 	receipt.classList.add('receipt__info');
 
-	const userInfo = document.createElement('ul');
+	const userInfo = createInfoList(userData);
 	userInfo.classList.add('receipt__list');
-	for (let key in data.userData) {
-		const li = document.createElement('li');
-		li.classList.add('receipt__item');
-		li.textContent = `${getItemString(key)}: ${data.userData[key]}`;
-		userInfo.append(li);
-	}
 
-	const productInfo = document.createElement('ul');
+	const productInfo = createInfoList(productData);
 	productInfo.classList.add('receipt__list');
-	for (let key in data.productData) {
-		const li = document.createElement('li');
-		li.classList.add('receipt__item');
-		if (key === 'imageLink') {
-			const image = document.createElement('img')
-			image.classList.add('receipt__item--image')
-			image.src = data.productData[key]
-			li.append(image)
-		} else {
-			if (key === 'totalPrice' || key === 'price') {
-				li.textContent = `${getItemString(key)}: ${data.productData[key]} $`;
-			} else {
-				li.textContent = `${getItemString(key)}: ${data.productData[key]}`;
-			}
-		}
-		productInfo.append(li);
-	}
 
 	const closeBtn = document.createElement('button');
 	closeBtn.classList.add('receipt__close-btn');
@@ -221,6 +206,32 @@ function showOrderReceipt(data) {
 	receipt.append(userInfo, productInfo);
 	receiptWrapper.append(receiptTitle, receipt, closeBtn);
 	blur.append(receiptWrapper);
+}
+
+function createInfoList(data) {
+	const infoList = document.createElement('ul');
+	infoList.classList.add('receipt__list');
+
+	for (let key in data) {
+		const li = document.createElement('li');
+		li.classList.add('receipt__item');
+
+		if (key === 'imageLink') {
+			const image = document.createElement('img')
+			image.classList.add('receipt__item--image')
+			image.src = data[key]
+			li.append(image);
+		} else {
+			if (key === 'totalPrice' || key === 'price') {
+				li.textContent = `${getItemString(key)}: ${data[key]} $`;
+			} else {
+				li.textContent = `${getItemString(key)}: ${data[key]}`;
+			}
+		}
+
+		infoList.append(li);
+	}
+	return infoList;
 }
 
 function getItemString(key) {
@@ -277,7 +288,7 @@ function renderExistingOrders() {
 	const ordersList = document.querySelector('.my-orders__list');
 
 	if (ordersList.children.length > 0) {
-		ordersList.innerHTML = '';
+		ordersList.textContent = '';
 	}
 
 	existingOrders.forEach((order) => {
