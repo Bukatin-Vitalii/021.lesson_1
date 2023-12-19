@@ -117,6 +117,10 @@ formBtn.addEventListener('click', async (event) => {
 		await showLoader();
 		hideBuyForm();
 		showOrderReceipt(data);
+
+		const existingOrders = JSON.parse(localStorage.getItem('orders')) || [];
+		existingOrders.push(data);
+		localStorage.setItem('orders', JSON.stringify(existingOrders));
 	};
 });
 
@@ -241,4 +245,78 @@ function getItemString(key) {
 		default:
 			return '';
 	}
+}
+
+const myOrdersBtn = document.querySelector('.btn-to-orders');
+const shopBtn = document.querySelector('.btn-to-shop');
+const shop = document.querySelector('.shop');
+const myOrders = document.querySelector('.my-orders');
+
+shopBtn.addEventListener('click', () => {
+	hideMyOrders();
+});
+
+myOrdersBtn.addEventListener('click', () => {
+	showMyOrders();
+});
+
+function showMyOrders() {
+	shop.classList.add('shop_hidden');
+	myOrders.classList.add('my-orders_active');
+	renderExistingOrders();
+}
+
+function hideMyOrders() {
+	shop.classList.remove('shop_hidden');
+	myOrders.classList.remove('my-orders_active');
+}
+
+function renderExistingOrders() {
+	const existingOrders = JSON.parse(localStorage.getItem('orders')) || [];
+	const ordersList = document.querySelector('.my-orders__list');
+
+	if (ordersList.children.length > 0) {
+		ordersList.innerHTML = '';
+	}
+
+	existingOrders.forEach((order) => {
+		const orderItem = document.createElement('li');
+		orderItem.classList.add('my-orders__item', 'item');
+
+		const orderInfo = document.createElement('ul');
+		orderInfo.classList.add('item__info', 'info');
+
+		const userInfo = document.createElement('ul');
+		userInfo.classList.add('info__list');
+		for (let key in order.userData) {
+			const li = document.createElement('li');
+			li.classList.add('info__item');
+			li.textContent = `${getItemString(key)}: ${order.userData[key]}`;
+			userInfo.append(li);
+		}
+
+		const productInfo = document.createElement('ul');
+		productInfo.classList.add('info__list');
+		for (let key in order.productData) {
+			const li = document.createElement('li');
+			li.classList.add('info__item');
+			if (key === 'imageLink') {
+				const image = document.createElement('img')
+				image.classList.add('info__item--image')
+				image.src = order.productData[key]
+				li.append(image)
+			} else {
+				if (key === 'totalPrice' || key === 'price') {
+					li.textContent = `${getItemString(key)}: ${order.productData[key]} $`;
+				} else {
+					li.textContent = `${getItemString(key)}: ${order.productData[key]}`;
+				}
+			}
+			productInfo.append(li);
+		}
+
+		orderInfo.append(userInfo, productInfo);
+		orderItem.append(orderInfo);
+		ordersList.append(orderItem);
+	});
 }
