@@ -64,14 +64,14 @@ const renderItem = (item) => {
 	productInfo.append(title, image, price, buyBtn);
 }
 
-function showBuyForm() {
+const showBuyForm = () => {
 	form.classList.add('form_active');
-}
+};
 
-function hideBuyForm() {
+const hideBuyForm = () => {
 	form.classList.remove('form_active');
 	itemToOrder = null;
-}
+};
 
 const form = document.querySelector('.form');
 
@@ -96,22 +96,23 @@ const formBtn = document.querySelector('.form__submit');
 formBtn.addEventListener('click', async (event) => {
 	event.preventDefault();
 
-	const data = {
-		userData: {
-			fullName: document.querySelector('#fullName').value,
-			city: document.querySelector('#city').value,
-			postOfficeNumber: document.querySelector('#novaPoshta').value,
-			payMethod: document.querySelector('#payMethod').value,
-			quantity: document.querySelector('#quantity').value,
-			comment: document.querySelector('#comment').value,
-		},
-		productData: {
-			name: itemToOrder.name,
-			price: itemToOrder.price,
-			totalPrice: itemToOrder.price * document.querySelector('#quantity').value,
-			imageLink: itemToOrder.imageLink,
-		},
+
+	const userData = {
+		fullName: document.querySelector('#fullName').value,
+		city: document.querySelector('#city').value,
+		postOfficeNumber: document.querySelector('#novaPoshta').value,
+		payMethod: document.querySelector('#payMethod').value,
+		quantity: document.querySelector('#quantity').value,
+		comment: document.querySelector('#comment').value,
 	};
+	const productData = {
+		name: itemToOrder.name,
+		price: itemToOrder.price,
+		totalPrice: itemToOrder.price * document.querySelector('#quantity').value,
+		imageLink: itemToOrder.imageLink,
+	};
+
+	const data = { userData, productData };
 
 	if (validateForm()) {
 		await showLoader();
